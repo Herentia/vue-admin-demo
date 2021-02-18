@@ -25,6 +25,7 @@ module.exports = [
     type: 'post',
     response(config) {
       const { username } = config.body
+      console.log(config)
       const accessToken = accessTokens[username]
       if (!accessToken) {
         return {

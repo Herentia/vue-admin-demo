@@ -1,11 +1,11 @@
 const data = [
   {
-    title: 'vue-admin-beautiful-pro 1.7版本已发布，点我提前体验',
-    url: 'https://chu1204505056.gitee.io/vue-admin-beautiful-pro/#/index',
+    title: '这个一个滚动消息！！！',
+    url: 'https://www.baidu.com',
   },
   {
-    title: 'vue-admin-beautiful（antdv） vue3.0版本已发布，点我提前体验',
-    url: 'https://chu1204505056.gitee.io/vue-admin-beautiful-mini/#/index',
+    title: '这个第二个个滚动消息！！！',
+    url: 'https://www.baidu.com',
   },
 ]
 module.exports = [

@@ -57,16 +57,30 @@ export const asyncRoutes = [
     ],
   },
   {
-    path: '/user',
+    path: '/userManager',
     component: Layout,
-    redirect: '/userManage',
+    redirect: '/userManager',
+    name: 'UserManager',
+    alwaysShow: true,
+    meta: { title: '用户管理', icon: 'box-open' },
     children: [
       {
-        path: '/userManage',
-        name: 'userManage',
-        component: () => import('@/views/user/index'),
+        path: '/userManager',
+        name: 'userManager',
+        component: () => import('@/views/userManager/user'),
         meta: {
           title: '用户管理',
+          icon: 'bug',
+          // affix: true,
+          noKeepAlive: true,
+        },
+      },
+      {
+        path: '/role',
+        name: 'Role',
+        component: () => import('@/views/userManager/role'),
+        meta: {
+          title: '角色管理',
           icon: 'bug',
           // affix: true,
           noKeepAlive: true,

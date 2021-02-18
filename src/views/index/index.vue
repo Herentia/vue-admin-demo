@@ -103,15 +103,22 @@
 </template>
 
 <script>
+  import { getUsersList } from '@/api/users'
   export default {
     name: 'More',
     components: {},
     data() {
       return { nodeEnv: process.env.NODE_ENV }
     },
-    created() {},
+    created() {
+      // this.test()
+    },
     mounted() {},
-    methods: {},
+    methods: {
+      // async test() {
+      //   const test = await getUsersList()
+      // },
+    },
   }
 </script>
 <style lang="scss" scoped>
