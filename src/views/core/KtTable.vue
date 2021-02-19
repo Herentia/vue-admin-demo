@@ -192,11 +192,13 @@
       },
       // 选择切换
       selectionChange: function (selections) {
+        console.log('行数据切换' + selections)
         this.selections = selections
         this.$emit('selectionChange', { selections: selections })
       },
       // 选择切换
       handleCurrentChange: function (val) {
+        console.log('当前行数据' + val)
         this.$emit('handleCurrentChange', { val: val })
       },
       // 换页刷新

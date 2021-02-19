@@ -15,6 +15,7 @@
             :label="'查询'"
             perms="sys:role:view"
             type="primary"
+            @click="findPage(null)"
           />
         </el-form-item>
         <el-form-item>
@@ -23,11 +24,44 @@
             :label="'新增'"
             perms="sys:user:add"
             type="primary"
+            @click="handleAdd"
           />
         </el-form-item>
       </el-form>
     </div>
-
+    <!-- 表格过滤 -->
+    <div
+      class="toolbar"
+      style="float: right; padding-top: 10px; padding-right: 15px"
+    >
+      <el-form :inline="true" :size="size">
+        <el-form-item>
+          <el-button-group>
+            <el-tooltip content="刷新" placement="top">
+              <el-button
+                icon="iconfont kt-icon-jiazai_shuaxin"
+                @click="findPage(null)"
+              ></el-button>
+            </el-tooltip>
+            <el-tooltip content="列显示" placement="top">
+              <el-button
+                icon="iconfont kt-icon-liebiao"
+                @click="displayFilterColumnsDialog"
+              ></el-button>
+            </el-tooltip>
+            <!-- <el-tooltip content="导出" placement="top">
+					<el-button icon="fa fa-file-excel-o"></el-button>
+				</el-tooltip> -->
+          </el-button-group>
+        </el-form-item>
+      </el-form>
+      <!--表格显示列界面-->
+      <table-column-filter-dialog
+        ref="tableColumnFilterDialog"
+        :columns="columns"
+        @handleFilterColumns="handleFilterColumns"
+      />
+    </div>
     <!--表格内容栏-->
     <kt-table
       :height="350"
@@ -36,18 +70,104 @@
       :data="pageResult"
       :columns="filterColumns"
       @findPage="findPage"
+      @handleEdit="handleEdit"
+      @handleDelete="handleDelete"
     ></kt-table>
+    <!--新增编辑界面-->
+    <el-dialog
+      :title="operation ? '新增' : '编辑'"
+      width="40%"
+      :visible.sync="dialogVisible"
+      :close-on-click-modal="false"
+    >
+      <el-form
+        ref="dataForm"
+        :model="dataForm"
+        label-width="80px"
+        :rules="dataFormRules"
+        :size="size"
+        label-position="right"
+      >
+        <el-form-item v-if="false" label="ID" prop="id">
+          <el-input
+            v-model="dataForm.id"
+            :disabled="true"
+            auto-complete="off"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="用户名" prop="name">
+          <el-input v-model="dataForm.name" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input
+            v-model="dataForm.password"
+            type="password"
+            auto-complete="off"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="机构" prop="deptName">
+          <popup-tree-input
+            :data="deptData"
+            :props="deptTreeProps"
+            :prop="dataForm.deptName"
+            :node-key="'' + dataForm.deptId"
+            :current-change-handle="deptTreeCurrentChangeHandle"
+          />
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="dataForm.email" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="手机" prop="mobile">
+          <el-input v-model="dataForm.mobile" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item v-if="!operation" label="角色" prop="userRoles">
+          <el-select
+            v-model="dataForm.userRoles"
+            multiple
+            default-first-option
+            placeholder="请选择"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="item in roles"
+              :key="item.id"
+              :label="item.remark"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button :size="size" @click.native="dialogVisible = false">
+          {{ '关闭' }}
+        </el-button>
+        <el-button
+          :size="size"
+          type="primary"
+          :loading="editLoading"
+          @click.native="submitForm"
+        >
+          {{ '提交' }}
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
   import KtButton from '@/views/core/KtButton'
   import KtTable from '@/views/core/KtTable'
-  import { getUsersList } from '@/api/users'
+  import TableColumnFilterDialog from '@/views/core/TableColumnFilterDialog'
+  import PopupTreeInput from '@/components/PopupTreeInput'
+  import { findPage } from '@/api/users'
+  import { findDeptTree } from '@/api/dept'
+  import { findAll } from '@/api/role'
   export default {
     components: {
       KtButton,
       KtTable,
+      TableColumnFilterDialog,
+      PopupTreeInput,
     },
     data() {
       return {
@@ -76,6 +196,7 @@
           mobile: '13889700023',
           status: 1,
           userRoles: [],
+          cc: [],
         },
         deptData: [],
         deptTreeProps: {
@@ -86,12 +207,21 @@
       }
     },
     mounted() {
+      this.findDeptTree()
       this.initColumns()
     },
     methods: {
       //获取分页数据
-      async findPage() {
-        this.pageResult = await getUsersList()
+      async findPage(data) {
+        if (data !== null) {
+          this.pageRequest = data.pageRequest
+        }
+        this.pageRequest.columnFilters = {
+          name: { name: 'name', value: this.filters.name },
+        }
+        let res = await findPage(this.pageRequest)
+        this.pageResult = res.data
+        this.findUserRoles()
       },
       // 处理表格列过滤显示
       initColumns() {
@@ -105,6 +235,102 @@
           { prop: 'status', label: '状态', minWidth: 70 },
         ]
         this.filterColumns = JSON.parse(JSON.stringify(this.columns))
+      },
+      // 加载用户角色信息
+      async findUserRoles() {
+        let res = await findAll()
+        this.roles = res.content
+      },
+      // 批量删除
+      handleDelete: function (data) {
+        this.$api.user
+          .batchDelete(data.params)
+          .then(data != null ? data.callback : '')
+      },
+      // 新增用户
+      handleAdd() {
+        this.dialogVisible = true
+        this.operation = true
+        this.dataForm = {
+          id: 0,
+          name: '',
+          password: '',
+          deptId: 1,
+          deptName: '',
+          email: 'test@qq.com',
+          mobile: '13889700023',
+          status: 1,
+          userRoles: [],
+        }
+      },
+      // 显示编辑界面
+      handleEdit(params) {
+        this.dialogVisible = true
+        this.operation = false
+        this.dataForm = Object.assign({}, params.row)
+        let userRoles = []
+        for (let i = 0, len = params.row.userRoles.length; i < len; i++) {
+          userRoles.push(params.row.userRoles[i].roleId)
+        }
+        this.dataForm.userRoles = userRoles
+      },
+      // 编辑
+      submitForm: function () {
+        this.$refs.dataForm.validate((valid) => {
+          if (valid) {
+            this.$confirm('确认提交吗？', '提示', {}).then(() => {
+              this.editLoading = true
+              let params = Object.assign({}, this.dataForm)
+              console.log(params)
+              let userRoles = []
+              for (let i = 0, len = params.userRoles.length; i < len; i++) {
+                let userRole = {
+                  userId: params.id,
+                  roleId: params.userRoles[i],
+                }
+                userRoles.push(userRole)
+              }
+              params.userRoles = userRoles
+              this.$api.user.save(params).then((res) => {
+                this.editLoading = false
+                if (res.code == 200) {
+                  this.$message({ message: '操作成功', type: 'success' })
+                  this.dialogVisible = false
+                  this.$refs['dataForm'].resetFields()
+                } else {
+                  this.$message({
+                    message: '操作失败, ' + res.msg,
+                    type: 'error',
+                  })
+                }
+                this.findPage(null)
+              })
+            })
+          }
+        })
+      },
+      // 获取部门列表
+      async findDeptTree() {
+        let res = await findDeptTree()
+        this.deptData = res.data
+      },
+      // 菜单树选中
+      deptTreeCurrentChangeHandle(data, node) {
+        this.dataForm.deptId = data.id
+        this.dataForm.deptName = data.name
+      },
+      // 时间格式化
+      dateFormat: function (row, column, cellValue, index) {
+        return format(row[column.property])
+      },
+      // 处理表格列过滤显示
+      displayFilterColumnsDialog: function () {
+        this.$refs.tableColumnFilterDialog.setDialogVisible(true)
+      },
+      // 处理表格列过滤显示
+      handleFilterColumns: function (data) {
+        this.filterColumns = data.filterColumns
+        this.$refs.tableColumnFilterDialog.setDialogVisible(false)
       },
     },
   }

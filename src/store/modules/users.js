@@ -5,6 +5,10 @@ export default {
       'sys:role:edit',
       'sys:role:view',
       'sys:role:add',
+      'sys:user:delete',
+      'sys:user:edit',
+      'sys:user:view',
+      'sys:user:add',
     ], // 用户权限标识集合
   },
   getters: {},

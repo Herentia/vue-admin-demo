@@ -22,7 +22,7 @@
           <kt-button
             icon="iconfont kt-icon-jiahao"
             :label="'新增'"
-            perms=""
+            perms="sys:role:add"
             type="primary"
             @click="handleAdd"
           />
@@ -30,7 +30,7 @@
       </el-form>
     </div>
     <!--表格内容栏-->
-    <!-- <kt-table
+    <kt-table
       :height="220"
       perms-edit="sys:role:edit"
       perms-delete="sys:role:delete"
@@ -43,7 +43,7 @@
       @findPage="findPage"
       @handleEdit="handleEdit"
       @handleDelete="handleDelete"
-    ></kt-table> -->
+    ></kt-table>
     <!--新增编辑界面-->
     <el-dialog
       :title="operation ? '新增' : '编辑'"
@@ -133,6 +133,7 @@
           padding-bottom: 4px;
         "
       >
+        <!-- 重置按钮 -->
         <kt-button
           :label="'重置'"
           perms="sys:role:edit"
@@ -140,6 +141,7 @@
           :disabled="selectRole.id == null"
           @click="resetSelection"
         />
+        <!-- 提交按钮 -->
         <kt-button
           :label="'提交'"
           perms="sys:role:edit"
@@ -162,7 +164,7 @@
   export default {
     components: {
       KtButton,
-      // KtTable,
+      KtTable,
     },
     data() {
       return {
@@ -279,15 +281,22 @@
       },
       // 角色选择改变监听
       handleRoleSelectChange(val) {
-        console.log(val)
         if (val == null || val.val == null) {
           return
         }
         this.selectRole = val.val
-        this.$api.role.findRoleMenus({ roleId: val.val.id }).then((res) => {
-          this.currentRoleMenus = res.data
-          this.$refs.menuTree.setCheckedNodes(res.data)
-        })
+        console.log(this.selectRole)
+        this.currentRoleMenus = [{ id: 1 }, { id: 2 }, { id: 9 }, { id: 10 }]
+        this.$refs.menuTree.setCheckedNodes([
+          { id: 1 },
+          { id: 2 },
+          { id: 9 },
+          { id: 10 },
+        ])
+        // this.$api.role.findRoleMenus({ roleId: val.val.id }).then((res) => {
+        //   this.currentRoleMenus = res.data
+        //   this.$refs.menuTree.setCheckedNodes(res.data)
+        // })
       },
       // 树节点选择监听
       handleMenuCheckChange(data, check, subCheck) {

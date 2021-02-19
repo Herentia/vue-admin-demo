@@ -23,9 +23,19 @@ for (let i = 0; i < pageSize; i++) {
   obj.createTime = '2018-08-14 11:11:11'
   obj.createBy = 'admin'
   obj.createTime = '2018-09-14 12:12:12'
+  obj.userRoles = [1]
   content.push(obj)
 }
+const findPageData = {
+  code: 200,
+  msg: 'success',
+  data: {},
+}
+findPageData.data.pageNum = pageNum
+findPageData.data.pageSize = pageSize
+findPageData.data.totalSize = 20
 module.exports = [
+  // 查询全部用户信息
   {
     url: '/users/getUsersList',
     type: 'get',
@@ -35,6 +45,34 @@ module.exports = [
         msg: 'success',
         content,
       }
+    },
+  },
+  // 查询用户分页信息
+  {
+    url: '/users/findPage',
+    type: 'post',
+    response(config) {
+      const { columnFilters = {}, pageNum = 1, pageSize = 5 } = config.body
+      let pageList = {}
+      if (
+        Object.keys(columnFilters).length > 0 &&
+        columnFilters.name.value != ''
+      ) {
+        let filterContent = content.filter((_item) =>
+          _item.name.includes(columnFilters.name.value)
+        )
+        pageList = filterContent.filter(
+          (_item, index) =>
+            index < pageSize * pageNum && index >= pageSize * (pageNum - 1)
+        )
+      } else {
+        pageList = content.filter(
+          (_item, index) =>
+            index < pageSize * pageNum && index >= pageSize * (pageNum - 1)
+        )
+      }
+      findPageData.data.content = pageList
+      return findPageData
     },
   },
 ]

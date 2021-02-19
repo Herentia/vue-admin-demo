@@ -5,7 +5,7 @@ import store from '@/store'
  * @param perms
  */
 export function hasPermission(perms) {
-  let hasPermission = true
+  let hasPermission = false
   let permissions = store.state.users.perms
   for (let i = 0, len = permissions.length; i < len; i++) {
     if (permissions[i] === perms) {

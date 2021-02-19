@@ -63,7 +63,6 @@
       },
       hasPerms: function (perms) {
         // 根据权限标识和外部指示状态进行权限判断
-        console.log(hasPermission(perms))
         return hasPermission(perms) & !this.disabled
       },
     },
