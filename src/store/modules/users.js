@@ -9,6 +9,10 @@ export default {
       'sys:user:edit',
       'sys:user:view',
       'sys:user:add',
+      'sys:dept:delete',
+      'sys:dept:edit',
+      'sys:dept:view',
+      'sys:dept:add',
     ], // 用户权限标识集合
   },
   getters: {},

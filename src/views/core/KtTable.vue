@@ -198,7 +198,7 @@
       },
       // 选择切换
       handleCurrentChange: function (val) {
-        console.log('当前行数据' + val)
+        console.log(val)
         this.$emit('handleCurrentChange', { val: val })
       },
       // 换页刷新
@@ -208,6 +208,7 @@
       },
       // 编辑
       handleEdit: function (index, row) {
+        console.log(row)
         this.$emit('handleEdit', { index: index, row: row })
       },
       // 删除

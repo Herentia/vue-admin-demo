@@ -76,11 +76,44 @@ export const asyncRoutes = [
         },
       },
       {
+        path: '/dept',
+        name: 'Dept',
+        component: () => import('@/views/userManager/dept'),
+        meta: {
+          title: '机构管理',
+          icon: 'bug',
+          // affix: true,
+          noKeepAlive: true,
+        },
+      },
+      {
         path: '/role',
         name: 'Role',
         component: () => import('@/views/userManager/role'),
         meta: {
           title: '角色管理',
+          icon: 'bug',
+          // affix: true,
+          noKeepAlive: true,
+        },
+      },
+    ],
+  },
+  {
+    path: '/videoMonitor',
+    component: Layout,
+    redirect: '/videoMonitor',
+    // component: () => import('@/views/videoMonitor/videoMonitor'),
+    name: 'VideoMonitor',
+    // alwaysShow: true,
+    // meta: { title: '监控管理', icon: 'box-open' },
+    children: [
+      {
+        path: '/videoMonitor',
+        name: 'videoMonitor',
+        component: () => import('@/views/videoMonitor/videoMonitor'),
+        meta: {
+          title: '监控管理',
           icon: 'bug',
           // affix: true,
           noKeepAlive: true,

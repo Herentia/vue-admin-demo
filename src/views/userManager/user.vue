@@ -124,7 +124,6 @@
           <el-select
             v-model="dataForm.userRoles"
             multiple
-            default-first-option
             placeholder="请选择"
             style="width: 100%"
           >
@@ -196,7 +195,6 @@
           mobile: '13889700023',
           status: 1,
           userRoles: [],
-          cc: [],
         },
         deptData: [],
         deptTreeProps: {
@@ -269,9 +267,11 @@
         this.operation = false
         this.dataForm = Object.assign({}, params.row)
         let userRoles = []
+        console.log(params.row)
         for (let i = 0, len = params.row.userRoles.length; i < len; i++) {
           userRoles.push(params.row.userRoles[i].roleId)
         }
+        console.log(userRoles)
         this.dataForm.userRoles = userRoles
       },
       // 编辑

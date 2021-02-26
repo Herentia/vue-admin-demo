@@ -43,6 +43,7 @@
     "core-js": "^3.8.2",
     "dayjs": "^1.10.3",
     "element-ui": "^2.15.0",
+    "ezuikit-js": "^0.2.3",
     "js-cookie": "^2.2.1",
     "jsencrypt": "^3.0.0-rc.1",
     "lodash": "^4.17.20",

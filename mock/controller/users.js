@@ -23,7 +23,7 @@ for (let i = 0; i < pageSize; i++) {
   obj.createTime = '2018-08-14 11:11:11'
   obj.createBy = 'admin'
   obj.createTime = '2018-09-14 12:12:12'
-  obj.userRoles = [1]
+  // obj.userRoles = [1]
   content.push(obj)
 }
 const findPageData = {
